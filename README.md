@@ -2,6 +2,10 @@
 
 This lib helps you to create a class at runtime from a JSON. It means that you don't need to change your class every time a JSON that you consume has changed.
 
+## BETA Version
+You can convert only simple JSON like "{Foo: barValue}". <br>
+If you try to convert this kind of JSON "{'Foo': {Bar1: barValue, Bar2: bar2Value}}", it will fail (I'm working on this feature).
+
 ## Installation
 
 Use the package manager to install.
@@ -18,7 +22,7 @@ using DotNet.J2Class;
 ```
 and
 ```C#
-string json = "YOUR JSON";
+string json = @"{'Foo': 'barValue'}";
 
 //You can set a name
 //for the class that will be created.
@@ -30,6 +34,7 @@ string className = "CLASS_NAME";
 string moduleName = "MODULE_NAME"
 
 var myObject = J2Class.CreateObjectFromJson(json, className, moduleName);
+//myObject will be like a "className" object with a string property called "Foo" and its value "barValue" 
 ```
 
 ## Contributing
