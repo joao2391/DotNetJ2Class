@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
 
 namespace DotNet.J2Class
 {
@@ -47,6 +52,27 @@ namespace DotNet.J2Class
             var keyValueResult = keyValue.Count > 0 ? keyValue : new Dictionary<string, string>();
 
             return keyValueResult;
+
+        }
+
+
+        internal static IDictionary<string, IDictionary<string, string>> ReturnKeyValueFromComplexJson(string json)
+        {          
+            
+            Dictionary<string, string[]> keyValues = new Dictionary<string, string[]>();
+            Dictionary<string, IDictionary<string, string>> dicViga = new Dictionary<string, IDictionary<string, string>>();
+
+            var json2 = JObject.Parse(json);
+
+            foreach (var item in json2)
+            {
+                var result = ReturnKeyValueFromJson(item.Value.ToString());
+                dicViga.Add(item.Key, result);
+            }
+
+            var resultCollection = dicViga.Count > 0 ? dicViga : new Dictionary<string, IDictionary<string, string>>();
+
+            return resultCollection;
 
         }
     }

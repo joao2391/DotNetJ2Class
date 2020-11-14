@@ -1,14 +1,19 @@
 using NUnit.Framework;
 using DotNet.J2Class;
+using Newtonsoft.Json;
 using System.Reflection;
-using System;
+using System.IO;
 
 namespace DotNet.J2Class.Tests
 {
+    public class Teste
+    {
+        public object MyProperty { get; set; }
+    }
     public class J2ClassTests
     {
 
-        const string JSON_ONE_VALUE = @"{'Test1':'TestValue1'}";        
+        const string JSON_ONE_VALUE = @"{'TestProp': { 'Test': 'TestValue', 'Test2':'TestValue2'}, 'TestProp2': { 'Test2' : 'Test2Value'} }";//@"{'Test1':'TestValue1'}";        
         const string JSON_TWO_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2'}";
         const string JSON_THREE_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2', 'Test3':'TestValue3'}";
         const string JSON_FOUR_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2', 'Test3':'TestValue3', 'Test4': 'TestValue4'}";
@@ -26,6 +31,8 @@ namespace DotNet.J2Class.Tests
         [Test]
         public void Should_Return_An_Object_With_One_Property_And_Value()
         {
+            //JsonTextReader reader = new JsonTextReader(new StringReader(JSON_ONE_VALUE));                            
+
             object obj = J2Class.CreateObjectFromJson(JSON_ONE_VALUE, "TestClass", "TestModule");
 
             PropertyInfo propInfo = obj.GetType().GetProperty("Test1");

@@ -6,10 +6,17 @@
     <Authors>joao2391</Authors>
     <PackageReleaseNotes>Beta Version:
 Now you can convert only simple JSON like "{Foo: barValue}". If you try to convert this kind of JSON "{'Foo': {Bar1: barValue, Bar2: bar2Value}}", it will fail.</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/joao2391/DotNetJ2Class</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/joao2391/DotNetJ2Class</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>JSON; Converter; ConvertJSONToClassCSharp; C#; Dotnetstandard; dotnetcore;</PackageTags>
+    <PackageId>DotNetJ2Class</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="JmesPath.Net" Version="1.0.125" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
