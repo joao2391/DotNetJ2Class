@@ -11,7 +11,7 @@ namespace DotNet.J2Class
 {
     static class StringNormalize
     {
-        internal static IDictionary<string, string> ReturnKeyValueFromJson(string json)
+        internal static IDictionary<string, object> ReturnKeyValueFromJson(string json)
         {
             var removed = json.Remove(0, 1);
             removed = removed.Remove(removed.Length - 1);
@@ -20,7 +20,7 @@ namespace DotNet.J2Class
 
             var newjson3 = new string[newjson.Length * 2];
 
-            Dictionary<string, string> keyValue = new Dictionary<string, string>();
+            Dictionary<string, object> keyValue = new Dictionary<string, object>();
 
             for (int i = 0; i < newjson.Length; i++)
             {
@@ -49,18 +49,18 @@ namespace DotNet.J2Class
                 }
             }
 
-            var keyValueResult = keyValue.Count > 0 ? keyValue : new Dictionary<string, string>();
+            var keyValueResult = keyValue.Count > 0 ? keyValue : new Dictionary<string, object>();
 
             return keyValueResult;
 
         }
 
 
-        internal static IDictionary<string, IDictionary<string, string>> ReturnKeyValueFromComplexJson(string json)
+        internal static IDictionary<string, IDictionary<string, object>> ReturnKeyValueFromComplexJson(string json)
         {          
             
             Dictionary<string, string[]> keyValues = new Dictionary<string, string[]>();
-            Dictionary<string, IDictionary<string, string>> dicViga = new Dictionary<string, IDictionary<string, string>>();
+            Dictionary<string, IDictionary<string, object>> dicViga = new Dictionary<string, IDictionary<string, object>>();
 
             var json2 = JObject.Parse(json);
 
@@ -70,7 +70,12 @@ namespace DotNet.J2Class
                 dicViga.Add(item.Key, result);
             }
 
-            var resultCollection = dicViga.Count > 0 ? dicViga : new Dictionary<string, IDictionary<string, string>>();
+            foreach (var item3 in dicViga)
+            {
+                var sas = item3.Value;
+            }
+
+            var resultCollection = dicViga.Count > 0 ? dicViga : new Dictionary<string, IDictionary<string, object>>();
 
             return resultCollection;
 

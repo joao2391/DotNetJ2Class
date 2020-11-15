@@ -25,7 +25,9 @@ namespace DotNet.J2Class
         {
             try
             {
-                var keyValueTeste = StringNormalize.ReturnKeyValueFromComplexJson(json);
+                //var keyValueTeste = StringNormalize.ReturnKeyValueFromComplexJson(json);
+
+                var teste = CreateObjectFromComplexJson(json,className,moduleName);
 
                 var keyValue = StringNormalize.ReturnKeyValueFromJson(json);
 
@@ -77,13 +79,17 @@ namespace DotNet.J2Class
             
         }
 
-        private static Type CompileResultTypeForComplexJson(IDictionary<string, IDictionary<string, string>> keyValues, string className, string moduleName)
+        private static Type CompileResultTypeForComplexJson(IDictionary<string, IDictionary<string, object>> keyValues, string className, string moduleName)
         {
-            TypeBuilder tb = GetTypeBuilderForComplexJson(className, moduleName);
-          
+            TypeBuilder tb = GetTypeBuilderForComplexJson(className, moduleName, keyValues);
+            
             foreach (var field in keyValues)
             {
-                CreateProperty(tb, field.Key, field.Value.GetType());
+                foreach (var item in field.Value)
+                {
+                  CreatePropertyForComplexJson(tb, field.Key, item.GetType());
+                }
+                
             }
                 
             
@@ -92,12 +98,63 @@ namespace DotNet.J2Class
             return objectType;
         }
 
-        private static TypeBuilder GetTypeBuilderForComplexJson(string className, string moduleName)
-        {            
-            var an = new AssemblyName(className);
+        private static TypeBuilder GetTypeBuilderForComplexJson(string className, string moduleName, IDictionary<string, IDictionary<string, object>> keyValues)
+        {     
+             var an = new AssemblyName(className);
             AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
             
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
+
+            TypeBuilder parentBuilder = moduleBuilder.DefineType(className, TypeAttributes.Public);
+            TypeBuilder childBuilder = null;
+            PropertyBuilder propertyBuilder = null;
+            var lstProps = new List<PropertyBuilder>();
+            FieldBuilder fieldBuilder = null;
+
+            foreach (var item in keyValues)
+            {
+                childBuilder = parentBuilder.DefineNestedType(item.Key, TypeAttributes.NestedPublic);
+                foreach (var item2 in item.Value.Keys)
+                {
+                  lstProps.Add(parentBuilder.DefineProperty(item2, PropertyAttributes.None, childBuilder, null));
+                }
+                
+            }
+
+            //TypeBuilder childBuilder2 = parentBuilder.DefineNestedType("Child", TypeAttributes.NestedPublic);
+            //PropertyBuilder propertyBuilder = parentBuilder.DefineProperty("MyChild", PropertyAttributes.None, childBuilder, null);
+
+            // Define field
+            //FieldBuilder fieldBuilder = parentBuilder.DefineField("myChild", childBuilder, FieldAttributes.Private);
+            // Define "getter" for MyChild property
+            MethodBuilder getterBuilder = parentBuilder.DefineMethod("get_MyChild",
+                                                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                                                childBuilder,
+                                                Type.EmptyTypes);
+            ILGenerator getterIL = getterBuilder.GetILGenerator();
+            getterIL.Emit(OpCodes.Ldarg_0);
+            getterIL.Emit(OpCodes.Ldfld, fieldBuilder);
+            getterIL.Emit(OpCodes.Ret);
+
+            // Define "setter" for MyChild property
+            MethodBuilder setterBuilder = parentBuilder.DefineMethod("set_MyChild", 
+                                                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                                                null,
+                                                new Type[] { childBuilder });
+            ILGenerator setterIL = setterBuilder.GetILGenerator();
+            setterIL.Emit(OpCodes.Ldarg_0);
+            setterIL.Emit(OpCodes.Ldarg_1);
+            setterIL.Emit(OpCodes.Stfld, fieldBuilder);
+            setterIL.Emit(OpCodes.Ret);
+
+            propertyBuilder.SetGetMethod(getterBuilder);
+            propertyBuilder.SetSetMethod(setterBuilder);
+
+            // var an = new AssemblyName(className);
+            // AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
+            
+            // ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
+            
             TypeBuilder tb = moduleBuilder.DefineType(className,
                     TypeAttributes.Public |
                     TypeAttributes.Class |
@@ -111,7 +168,7 @@ namespace DotNet.J2Class
 
         private static void CreatePropertyForComplexJson(TypeBuilder tb, string propertyName, Type propertyType)
         {
-            FieldBuilder fieldBuilder = tb.DefineField("_" + propertyName, propertyType, FieldAttributes.Private);            
+            FieldBuilder fieldBuilder = tb.DefineField("_" + propertyName, propertyType, FieldAttributes.Private);
 
             PropertyBuilder propertyBuilder = tb.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
 
@@ -151,7 +208,7 @@ namespace DotNet.J2Class
             
         }
 
-         private static Type CompileResultType(IDictionary<string, string> keyValue, string className, string moduleName)
+         private static Type CompileResultType(IDictionary<string, object> keyValue, string className, string moduleName)
         {
             TypeBuilder tb = GetTypeBuilder(className, moduleName);
             //ConstructorBuilder constructor = tb.DefineDefaultConstructor(MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
