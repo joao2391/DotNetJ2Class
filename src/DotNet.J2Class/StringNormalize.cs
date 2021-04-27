@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using LitJson;
 
 namespace DotNet.J2Class
 {

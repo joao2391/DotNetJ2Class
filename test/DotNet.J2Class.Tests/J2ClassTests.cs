@@ -13,7 +13,7 @@ namespace DotNet.J2Class.Tests
     public class J2ClassTests
     {
 
-        const string JSON_ONE_VALUE = @"{'TestProp': { 'Test': 'TestValue', 'Test2':'TestValue2'}, 'TestProp2': { 'Test2' : 'Test2Value'} }";//@"{'Test1':'TestValue1'}";        
+        const string JSON_ONE_VALUE = @"{'TestProp': { 'TestF1': 'TestValue1', 'TestF2':'TestValue2'}, 'TestProp2': { 'TestP2' : 'TestValueP2'} }";//@"{'Test1':'TestValue1'}";        
         const string JSON_TWO_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2'}";
         const string JSON_THREE_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2', 'Test3':'TestValue3'}";
         const string JSON_FOUR_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2', 'Test3':'TestValue3', 'Test4': 'TestValue4'}";

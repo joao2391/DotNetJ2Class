@@ -81,80 +81,23 @@ namespace DotNet.J2Class
 
         private static Type CompileResultTypeForComplexJson(IDictionary<string, IDictionary<string, object>> keyValues, string className, string moduleName)
         {
-            TypeBuilder tb = GetTypeBuilderForComplexJson(className, moduleName, keyValues);
-            
-            foreach (var field in keyValues)
-            {
-                foreach (var item in field.Value)
-                {
-                  CreatePropertyForComplexJson(tb, field.Key, item.GetType());
-                }
-                
-            }
-                
-            
+            TypeBuilder tb = GetTypeBuilderForComplexJson(className, moduleName);
+
+            CreatePropertyForComplexJson(tb, keyValues);
+
             Type objectType = tb.CreateTypeInfo();
             
             return objectType;
         }
 
-        private static TypeBuilder GetTypeBuilderForComplexJson(string className, string moduleName, IDictionary<string, IDictionary<string, object>> keyValues)
-        {     
-             var an = new AssemblyName(className);
+        private static TypeBuilder GetTypeBuilderForComplexJson(string className, string moduleName)
+        {   
+            //!Define o nome do Assembly  
+            var an = new AssemblyName(className);
+
             AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
             
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
-
-            TypeBuilder parentBuilder = moduleBuilder.DefineType(className, TypeAttributes.Public);
-            TypeBuilder childBuilder = null;
-            PropertyBuilder propertyBuilder = null;
-            var lstProps = new List<PropertyBuilder>();
-            FieldBuilder fieldBuilder = null;
-
-            foreach (var item in keyValues)
-            {
-                childBuilder = parentBuilder.DefineNestedType(item.Key, TypeAttributes.NestedPublic);
-                foreach (var item2 in item.Value.Keys)
-                {
-                  lstProps.Add(parentBuilder.DefineProperty(item2, PropertyAttributes.None, childBuilder, null));
-                }
-                
-            }
-
-            //TypeBuilder childBuilder2 = parentBuilder.DefineNestedType("Child", TypeAttributes.NestedPublic);
-            //PropertyBuilder propertyBuilder = parentBuilder.DefineProperty("MyChild", PropertyAttributes.None, childBuilder, null);
-
-            // Define field
-            //FieldBuilder fieldBuilder = parentBuilder.DefineField("myChild", childBuilder, FieldAttributes.Private);
-            // Define "getter" for MyChild property
-            MethodBuilder getterBuilder = parentBuilder.DefineMethod("get_MyChild",
-                                                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                                                childBuilder,
-                                                Type.EmptyTypes);
-            ILGenerator getterIL = getterBuilder.GetILGenerator();
-            getterIL.Emit(OpCodes.Ldarg_0);
-            getterIL.Emit(OpCodes.Ldfld, fieldBuilder);
-            getterIL.Emit(OpCodes.Ret);
-
-            // Define "setter" for MyChild property
-            MethodBuilder setterBuilder = parentBuilder.DefineMethod("set_MyChild", 
-                                                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                                                null,
-                                                new Type[] { childBuilder });
-            ILGenerator setterIL = setterBuilder.GetILGenerator();
-            setterIL.Emit(OpCodes.Ldarg_0);
-            setterIL.Emit(OpCodes.Ldarg_1);
-            setterIL.Emit(OpCodes.Stfld, fieldBuilder);
-            setterIL.Emit(OpCodes.Ret);
-
-            propertyBuilder.SetGetMethod(getterBuilder);
-            propertyBuilder.SetSetMethod(setterBuilder);
-
-            // var an = new AssemblyName(className);
-            // AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
-            
-            // ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
-            
             TypeBuilder tb = moduleBuilder.DefineType(className,
                     TypeAttributes.Public |
                     TypeAttributes.Class |
@@ -163,48 +106,87 @@ namespace DotNet.J2Class
                     TypeAttributes.BeforeFieldInit |
                     TypeAttributes.AutoLayout,
                     null);
-            return tb;
+            return tb;            
         }
 
-        private static void CreatePropertyForComplexJson(TypeBuilder tb, string propertyName, Type propertyType)
+        private static void CreatePropertyForComplexJson(TypeBuilder tb, IDictionary<string, IDictionary<string, object>> keyValues)//string propertyName, Type propertyType)
         {
-            FieldBuilder fieldBuilder = tb.DefineField("_" + propertyName, propertyType, FieldAttributes.Private);
 
-            PropertyBuilder propertyBuilder = tb.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
+            //var lstProps = new List<PropertyBuilder>();
+            //var lstClasses = new List<TypeBuilder>();
+            //var lstFields = new List<FieldBuilder>();
+            //var lstGetMethods = new List<MethodBuilder>();
+            //var lstSetMethods = new List<MethodBuilder>();
 
-            MethodBuilder getPropMthdBldr = tb.DefineMethod("get_" + propertyName, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, propertyType, Type.EmptyTypes);
+            //TypeBuilder childBuilder = null;
+            //PropertyBuilder propBuild = null;
 
-            ILGenerator getIl = getPropMthdBldr.GetILGenerator();
-            
-            getIl.Emit(OpCodes.Ldarg_0);
-            getIl.Emit(OpCodes.Ldfld, fieldBuilder);
-            getIl.Emit(OpCodes.Ret);
+            foreach (var item in keyValues)
+            {
+                CreateProperty(tb, item.Key, item.Value.GetType());
 
-            MethodBuilder setPropMthdBldr =
-                tb.DefineMethod("set_" + propertyName,
-                  MethodAttributes.Public |
-                  MethodAttributes.SpecialName |
-                  MethodAttributes.HideBySig,
-                  null, new[] { propertyType });
+                // childBuilder = tb.DefineNestedType(item.Key, TypeAttributes.NestedPublic);
 
-            
+                // lstClasses.Add(childBuilder); 
 
-            ILGenerator setIl = setPropMthdBldr.GetILGenerator();
-            Label modifyProperty = setIl.DefineLabel();
-            Label exitSet = setIl.DefineLabel();
+                // foreach (var item2 in item.Value.Keys)
+                // {                 
+                //    lstProps.Add(childBuilder.DefineProperty(item2, PropertyAttributes.HasDefault, item2.GetType(), null));
+                //    propBuild = tb.DefineProperty(item2, PropertyAttributes.HasDefault, item2.GetType(), null);
+                //    var testebld = tb.DefineProperty(item2, PropertyAttributes.HasDefault, childBuilder, null);
+                // }
+                
+            }
 
-            setIl.MarkLabel(modifyProperty);
-            setIl.Emit(OpCodes.Ldarg_0);
-            setIl.Emit(OpCodes.Ldarg_1);
-            setIl.Emit(OpCodes.Stfld, fieldBuilder);
+            //foreach (var item in lstClasses)
+            //{
+                // lstFields.Add(tb.DefineField(item.Name, item, FieldAttributes.Private));
+                // lstGetMethods.Add(tb.DefineMethod(string.Concat("get_",item.Name),
+                //                                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                //                                 item,
+                //                                 Type.EmptyTypes));
+                // lstSetMethods.Add(tb.DefineMethod(string.Concat("set_",item.Name),
+                //                                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                //                                 null, new Type[] { childBuilder }));
 
-            setIl.Emit(OpCodes.Nop);
-            setIl.MarkLabel(exitSet);
-            setIl.Emit(OpCodes.Ret);
 
-            propertyBuilder.SetGetMethod(getPropMthdBldr);
-            propertyBuilder.SetSetMethod(setPropMthdBldr);
-            
+
+                // var setMethods = tb.DefineMethod(string.Concat("set_",item.Name),
+                //                                  MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                //                                  null, new Type[] { childBuilder });
+
+                // var getMethods = tb.DefineMethod(string.Concat("get_",item.Name),
+                //                                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                //                                 childBuilder,
+                //                                 Type.EmptyTypes);
+                
+                // var fieldBuilder = tb.DefineField(item.Name, childBuilder, FieldAttributes.Private);
+                // ILGenerator getterIL = getMethods.GetILGenerator();
+                // getterIL.Emit(OpCodes.Ldarg_0);
+                // getterIL.Emit(OpCodes.Ldfld, fieldBuilder);
+                // getterIL.Emit(OpCodes.Ret);
+
+                // ILGenerator setterIL = setMethods.GetILGenerator();
+                // // setterIL.Emit(OpCodes.Ldarg_0);
+                // // setterIL.Emit(OpCodes.Ldarg_1);
+                // // setterIL.Emit(OpCodes.Stfld, fieldBuilder);
+                // // setterIL.Emit(OpCodes.Ret);
+                // Label modifyProperty = setterIL.DefineLabel();
+                // Label exitSet = setterIL.DefineLabel();
+
+                // setterIL.MarkLabel(modifyProperty);
+                // setterIL.Emit(OpCodes.Ldarg_0);
+                // setterIL.Emit(OpCodes.Ldarg_1);
+                // setterIL.Emit(OpCodes.Stfld, fieldBuilder);
+
+                // setterIL.Emit(OpCodes.Nop);
+                // setterIL.MarkLabel(exitSet);
+                // setterIL.Emit(OpCodes.Ret);
+
+                // propBuild.SetGetMethod(getMethods);
+                // propBuild.SetSetMethod(setMethods);
+            //}
+                      
             
         }
 
