@@ -19,16 +19,12 @@ namespace DotNet.J2Class
         /// </summary>
         /// <param name="json">JSON to be transformed in a class</param>
         /// <param name="className">The object will be create with this class name</param>
-        /// /// <param name="moduleName">The object will be create with this module name</param>
+        /// <param name="moduleName">The object will be create with this module name</param>
         /// <returns>Returns an object with properties and values extracts from JSON</returns>
         public static object CreateObjectFromJson(string json, string className = Constants.DEFAULT_CLASS_NAME, string moduleName = Constants.DEFAULT_MODULE_NAME)
         {
             try
             {
-                //var keyValueTeste = StringNormalize.ReturnKeyValueFromComplexJson(json);
-
-                var teste = CreateObjectFromComplexJson(json,className,moduleName);
-
                 var keyValue = StringNormalize.ReturnKeyValueFromJson(json);
 
                 Type myType = CompileResultType(keyValue, className, moduleName);
@@ -52,7 +48,16 @@ namespace DotNet.J2Class
             
         }
 
-        private static object CreateObjectFromComplexJson(string json, string className = Constants.DEFAULT_CLASS_NAME, string moduleName = Constants.DEFAULT_MODULE_NAME)
+        /// <summary>
+        /// Create an object from ComplexJson
+        /// that is passed as first parameter
+        /// at Runtime
+        /// </summary>
+        /// <param name="json">JSON to be transformed in a class</param>
+        /// <param name="className">The object will be create with this class name</param>
+        /// <param name="moduleName">The object will be create with this module name</param>
+        /// <returns>Returns an object with properties and values extracts from JSON</returns>
+        public static object CreateObjectFromComplexJson(string json, string className = Constants.DEFAULT_CLASS_NAME, string moduleName = Constants.DEFAULT_MODULE_NAME)
         {
             try
             {
@@ -91,8 +96,7 @@ namespace DotNet.J2Class
         }
 
         private static TypeBuilder GetTypeBuilderForComplexJson(string className, string moduleName)
-        {   
-            //!Define o nome do Assembly  
+        {               
             var an = new AssemblyName(className);
 
             AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
@@ -112,88 +116,17 @@ namespace DotNet.J2Class
         private static void CreatePropertyForComplexJson(TypeBuilder tb, IDictionary<string, IDictionary<string, object>> keyValues)//string propertyName, Type propertyType)
         {
 
-            //var lstProps = new List<PropertyBuilder>();
-            //var lstClasses = new List<TypeBuilder>();
-            //var lstFields = new List<FieldBuilder>();
-            //var lstGetMethods = new List<MethodBuilder>();
-            //var lstSetMethods = new List<MethodBuilder>();
-
-            //TypeBuilder childBuilder = null;
-            //PropertyBuilder propBuild = null;
-
             foreach (var item in keyValues)
             {
                 CreateProperty(tb, item.Key, item.Value.GetType());
-
-                // childBuilder = tb.DefineNestedType(item.Key, TypeAttributes.NestedPublic);
-
-                // lstClasses.Add(childBuilder); 
-
-                // foreach (var item2 in item.Value.Keys)
-                // {                 
-                //    lstProps.Add(childBuilder.DefineProperty(item2, PropertyAttributes.HasDefault, item2.GetType(), null));
-                //    propBuild = tb.DefineProperty(item2, PropertyAttributes.HasDefault, item2.GetType(), null);
-                //    var testebld = tb.DefineProperty(item2, PropertyAttributes.HasDefault, childBuilder, null);
-                // }
                 
-            }
-
-            //foreach (var item in lstClasses)
-            //{
-                // lstFields.Add(tb.DefineField(item.Name, item, FieldAttributes.Private));
-                // lstGetMethods.Add(tb.DefineMethod(string.Concat("get_",item.Name),
-                //                                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                //                                 item,
-                //                                 Type.EmptyTypes));
-                // lstSetMethods.Add(tb.DefineMethod(string.Concat("set_",item.Name),
-                //                                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                //                                 null, new Type[] { childBuilder }));
-
-
-
-                // var setMethods = tb.DefineMethod(string.Concat("set_",item.Name),
-                //                                  MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                //                                  null, new Type[] { childBuilder });
-
-                // var getMethods = tb.DefineMethod(string.Concat("get_",item.Name),
-                //                                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                //                                 childBuilder,
-                //                                 Type.EmptyTypes);
-                
-                // var fieldBuilder = tb.DefineField(item.Name, childBuilder, FieldAttributes.Private);
-                // ILGenerator getterIL = getMethods.GetILGenerator();
-                // getterIL.Emit(OpCodes.Ldarg_0);
-                // getterIL.Emit(OpCodes.Ldfld, fieldBuilder);
-                // getterIL.Emit(OpCodes.Ret);
-
-                // ILGenerator setterIL = setMethods.GetILGenerator();
-                // // setterIL.Emit(OpCodes.Ldarg_0);
-                // // setterIL.Emit(OpCodes.Ldarg_1);
-                // // setterIL.Emit(OpCodes.Stfld, fieldBuilder);
-                // // setterIL.Emit(OpCodes.Ret);
-                // Label modifyProperty = setterIL.DefineLabel();
-                // Label exitSet = setterIL.DefineLabel();
-
-                // setterIL.MarkLabel(modifyProperty);
-                // setterIL.Emit(OpCodes.Ldarg_0);
-                // setterIL.Emit(OpCodes.Ldarg_1);
-                // setterIL.Emit(OpCodes.Stfld, fieldBuilder);
-
-                // setterIL.Emit(OpCodes.Nop);
-                // setterIL.MarkLabel(exitSet);
-                // setterIL.Emit(OpCodes.Ret);
-
-                // propBuild.SetGetMethod(getMethods);
-                // propBuild.SetSetMethod(setMethods);
-            //}
-                      
+            }         
             
         }
 
          private static Type CompileResultType(IDictionary<string, object> keyValue, string className, string moduleName)
         {
-            TypeBuilder tb = GetTypeBuilder(className, moduleName);
-            //ConstructorBuilder constructor = tb.DefineDefaultConstructor(MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName);
+            TypeBuilder tb = GetTypeBuilder(className, moduleName);            
           
             foreach (var field in keyValue)
             {

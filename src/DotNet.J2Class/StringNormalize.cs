@@ -19,31 +19,31 @@ namespace DotNet.J2Class
 
             string[] newjson = removed.Split(',');
 
-            var newjson3 = new string[newjson.Length * 2];
+            var jsonWithInfoFormatted = new string[newjson.Length * 2];
 
             Dictionary<string, object> keyValue = new Dictionary<string, object>();
 
             for (int i = 0; i < newjson.Length; i++)
             {
-                if (newjson3[i] == null)
+                if (jsonWithInfoFormatted[i] == null)
                 {
-                    newjson[i].Split(':').CopyTo(newjson3, i);
+                    newjson[i].Split(':').CopyTo(jsonWithInfoFormatted, i);
                 }
                 else
                 {
-                    newjson[i].Split(':').CopyTo(newjson3, i * 2);
+                    newjson[i].Split(':').CopyTo(jsonWithInfoFormatted, i * 2);
                 }
 
             }
 
-            for (int i = 0; i < newjson3.Length; i++)
+            for (int i = 0; i < jsonWithInfoFormatted.Length; i++)
             {
                 if (i % 2 == 0)
                 {
-                    var removeChave = newjson3[i].Trim().Remove(0, 1);
+                    var removeChave = jsonWithInfoFormatted[i].Trim().Remove(0, 1);
                     removeChave = removeChave.Remove(removeChave.Length - 1);
 
-                    var removeValor = newjson3[i + 1].Remove(0, 1);
+                    var removeValor = jsonWithInfoFormatted[i + 1].Remove(0, 1);
                     removeValor = removeValor.Remove(removeValor.Length - 1);
 
                     keyValue.Add(removeChave, removeValor);
@@ -61,22 +61,17 @@ namespace DotNet.J2Class
         {          
             
             Dictionary<string, string[]> keyValues = new Dictionary<string, string[]>();
-            Dictionary<string, IDictionary<string, object>> dicViga = new Dictionary<string, IDictionary<string, object>>();
+            Dictionary<string, IDictionary<string, object>> keyValueObjDic = new Dictionary<string, IDictionary<string, object>>();
 
-            var json2 = JObject.Parse(json);
+            var jObject = JObject.Parse(json);
 
-            foreach (var item in json2)
+            foreach (var item in jObject)
             {
                 var result = ReturnKeyValueFromJson(item.Value.ToString());
-                dicViga.Add(item.Key, result);
+                keyValueObjDic.Add(item.Key, result);
             }
 
-            foreach (var item3 in dicViga)
-            {
-                var sas = item3.Value;
-            }
-
-            var resultCollection = dicViga.Count > 0 ? dicViga : new Dictionary<string, IDictionary<string, object>>();
+            var resultCollection = keyValueObjDic.Count > 0 ? keyValueObjDic : new Dictionary<string, IDictionary<string, object>>();
 
             return resultCollection;
 

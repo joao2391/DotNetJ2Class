@@ -1,27 +1,20 @@
 using NUnit.Framework;
 using DotNet.J2Class;
-using Newtonsoft.Json;
 using System.Reflection;
-using System.IO;
 
 namespace DotNet.J2Class.Tests
 {
-    public class Teste
-    {
-        public object MyProperty { get; set; }
-    }
     public class J2ClassTests
     {
 
-        const string JSON_ONE_VALUE = @"{'TestProp': { 'TestF1': 'TestValue1', 'TestF2':'TestValue2'}, 'TestProp2': { 'TestP2' : 'TestValueP2'} }";//@"{'Test1':'TestValue1'}";        
+        const string JSON_ONE_VALUE = @"{'Test1':'TestValue1'}";
         const string JSON_TWO_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2'}";
         const string JSON_THREE_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2', 'Test3':'TestValue3'}";
         const string JSON_FOUR_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2', 'Test3':'TestValue3', 'Test4': 'TestValue4'}";
         const string JSON_FIVE_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2', 'Test3':'TestValue3', 'Test4': 'TestValue4', 'Test5':'TestValue5'}";
         const string JSON_SIX_VALUES = @"{'Test1':'TestValue1', 'Test2':'TestValue2', 'Test3':'TestValue3', 'Test4': 'TestValue4', 'Test5':'TestValue5', 'Test6':'TestValue6'}";
-
-
-        //const string JSON_WITH_PROP = @"{'Prop': {'Test1':'TestValue1'}}";
+        const string COMPLEX_JSON_TWO_VALUES = @"{'TestProp': { 'TestF1': 'TestValue1', 'TestF2':'TestValue2'}, 'TestProp2': { 'TestP2' : 'TestValueP2'} }";
+        const string COMPLEX_JSON_THREE_VALUES = @"{'TestProp': { 'TestF1': 'TestValue1', 'TestF2':'TestValue2'}, 'TestProp2': { 'TestP2' : 'TestValueP2'},'TestProp3': { 'TestP3' : 'TestValueP3'} }";
 
         [SetUp]
         public void Setup()
@@ -31,8 +24,6 @@ namespace DotNet.J2Class.Tests
         [Test]
         public void Should_Return_An_Object_With_One_Property_And_Value()
         {
-            //JsonTextReader reader = new JsonTextReader(new StringReader(JSON_ONE_VALUE));                            
-
             object obj = J2Class.CreateObjectFromJson(JSON_ONE_VALUE, "TestClass", "TestModule");
 
             PropertyInfo propInfo = obj.GetType().GetProperty("Test1");
@@ -88,6 +79,24 @@ namespace DotNet.J2Class.Tests
             PropertyInfo propInfo = obj.GetType().GetProperty("Test6");
 
             Assert.IsNotNull(propInfo);
+        }
+
+        [Test]
+        public void Should_Return_An_Object_With_Two_ValuePairs()
+        {
+            var obj = J2Class.CreateObjectFromComplexJson(COMPLEX_JSON_TWO_VALUES, "TestComplexClass","TestComplexModule");
+
+            Assert.IsNotNull(obj);            
+
+        }
+
+        [Test]
+        public void Should_Return_An_Object_With_Three_ValuePairs()
+        {
+            var obj = J2Class.CreateObjectFromComplexJson(COMPLEX_JSON_THREE_VALUES, "TestComplexClass","TestComplexModule");
+
+            Assert.IsNotNull(obj);
+
         }
     }
 }
