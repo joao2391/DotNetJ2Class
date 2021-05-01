@@ -4,14 +4,14 @@ This lib helps you to create a class at runtime from a JSON. It means that you d
 
 ## BETA Version
 You can convert only simple JSON like "{Foo: barValue}". <br>
-If you try to convert this kind of JSON "{'Foo': {Bar1: barValue, Bar2: bar2Value}}", it will fail (I'm working on this feature).
+NEW: you can try to convert this kind of JSON "{'Foo': {Bar1: barValue, Bar2: bar2Value}}".
 
 ## Installation
 
 Use the package manager to install.
 
 ```bash
-Install-Package DotNetJ2Class -Version 1.0.0
+Install-Package DotNetJ2Class -Version 1.0.1
 ```
 
 ## Usage
