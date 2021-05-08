@@ -11,7 +11,7 @@ NEW: you can try to convert this kind of JSON "{'Foo': {Bar1: barValue, Bar2: ba
 Use the package manager to install.
 
 ```bash
-Install-Package DotNetJ2Class -Version 1.0.1
+Install-Package DotNetJ2Class -Version 1.0.2
 ```
 
 ## Usage
