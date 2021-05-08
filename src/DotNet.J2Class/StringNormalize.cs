@@ -14,45 +14,49 @@ namespace DotNet.J2Class
     {
         internal static IDictionary<string, object> ReturnKeyValueFromJson(string json)
         {
-            var removed = json.Remove(0, 1);
-            removed = removed.Remove(removed.Length - 1);
-
-            string[] newjson = removed.Split(',');
-
-            var jsonWithInfoFormatted = new string[newjson.Length * 2];
-
+         
             Dictionary<string, object> keyValue = new Dictionary<string, object>();
+            Dictionary<string, object> keyValueResult = new Dictionary<string, object>();
 
-            for (int i = 0; i < newjson.Length; i++)
-            {
-                if (jsonWithInfoFormatted[i] == null)
+            var removed = json.Remove(0, 1);
+                removed = removed.Remove(removed.Length - 1);
+
+                string[] newjson = removed.Split(',');
+
+                var jsonWithInfoFormatted = new string[newjson.Length * 2];
+
+                
+
+                for (int i = 0; i < newjson.Length; i++)
                 {
-                    newjson[i].Split(':').CopyTo(jsonWithInfoFormatted, i);
+                    if (jsonWithInfoFormatted[i] == null)
+                    {
+                        newjson[i].Split(':').CopyTo(jsonWithInfoFormatted, i);
+                    }
+                    else
+                    {
+                        newjson[i].Split(':').CopyTo(jsonWithInfoFormatted, i * 2);
+                    }
+
                 }
-                else
+
+                for (int i = 0; i < jsonWithInfoFormatted.Length; i++)
                 {
-                    newjson[i].Split(':').CopyTo(jsonWithInfoFormatted, i * 2);
+                    if (i % 2 == 0)
+                    {
+                        var removeChave = jsonWithInfoFormatted[i].Trim().Remove(0, 1);
+                        removeChave = removeChave.Remove(removeChave.Length - 1);
+
+                        var removeValor = jsonWithInfoFormatted[i + 1].Remove(0, 1);
+                        removeValor = removeValor.Remove(removeValor.Length - 1);
+
+                        keyValue.Add(removeChave, removeValor);
+                    }
                 }
 
-            }
+                keyValueResult = keyValue.Count > 0 ? keyValue : new Dictionary<string, object>();
 
-            for (int i = 0; i < jsonWithInfoFormatted.Length; i++)
-            {
-                if (i % 2 == 0)
-                {
-                    var removeChave = jsonWithInfoFormatted[i].Trim().Remove(0, 1);
-                    removeChave = removeChave.Remove(removeChave.Length - 1);
-
-                    var removeValor = jsonWithInfoFormatted[i + 1].Remove(0, 1);
-                    removeValor = removeValor.Remove(removeValor.Length - 1);
-
-                    keyValue.Add(removeChave, removeValor);
-                }
-            }
-
-            var keyValueResult = keyValue.Count > 0 ? keyValue : new Dictionary<string, object>();
-
-            return keyValueResult;
+                return keyValueResult;          
 
         }
 
@@ -67,8 +71,21 @@ namespace DotNet.J2Class
 
             foreach (var item in jObject)
             {
-                var result = ReturnKeyValueFromJson(item.Value.ToString());
-                keyValueObjDic.Add(item.Key, result);
+                var value = item.Value.ToString();
+
+                if(value.Contains('{'))
+                {
+                    var result = ReturnKeyValueFromJson(value);
+                    keyValueObjDic.Add(item.Key, result);
+                }
+                else
+                {
+                    var result = new Dictionary<string, object>();
+                    result.Add(item.Key, item.Value);
+                    keyValueObjDic.Add(item.Key, result);
+
+                }
+                
             }
 
             var resultCollection = keyValueObjDic.Count > 0 ? keyValueObjDic : new Dictionary<string, IDictionary<string, object>>();
