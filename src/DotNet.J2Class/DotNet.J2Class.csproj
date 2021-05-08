@@ -12,7 +12,7 @@ Now you can convert only simple JSON like "{Foo: barValue}". If you try to conve
     <RepositoryType>Git</RepositoryType>
     <PackageTags>JSON; Converter; ConvertJSONToClassCSharp; C#; Dotnetstandard; dotnetcore;</PackageTags>
     <PackageId>DotNetJ2Class</PackageId>
-     <Version>1.0.1</Version>
+     <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
