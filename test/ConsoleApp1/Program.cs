@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using System.Net;
+using System.Net.Http;
 
 namespace ConsoleApp1
 {
@@ -12,7 +14,8 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var client = new HttpClient();
+            var resp = client.GetAsync("https://gorest.co.in/public/v2/users/1").Result.Content.ReadAsStringAsync().Result;
 
             string json = @"{'Test':'TestValue', 'Test2':'TestValue2', 'Test3':'TestValue3'}";
             string json2 = @"{'TestProp': { 'Test': 'TestValue'} }";
@@ -24,7 +27,7 @@ namespace ConsoleApp1
             Console.WriteLine(result);
             Console.WriteLine(tipo.GetProperties());
            
-            var myObject = J2Class.CreateObjectFromJson(json, "TesteClass", "");
+            var myObject = J2Class.CreateObjectFromComplexJson(resp, "TesteClass");
 
             Console.ReadKey();
         }

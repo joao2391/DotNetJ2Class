@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFramework>net6.0</TargetFramework>
     <Description>This lib helps you to create a class at runtime from a JSON. It means that you don't need to change your class every time a JSON that you consume has changed.</Description>
     <Authors>joao2391</Authors>
     <PackageReleaseNotes>Beta Version:
@@ -12,14 +12,12 @@ Now you can convert only simple JSON like "{Foo: barValue}". If you try to conve
     <RepositoryType>Git</RepositoryType>
     <PackageTags>JSON; Converter; ConvertJSONToClassCSharp; C#; Dotnetstandard; dotnetcore;</PackageTags>
     <PackageId>DotNetJ2Class</PackageId>
-     <Version>1.0.2</Version>
+     <Version>1.0.3</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JmesPath.Net" Version="1.0.125" />
-    <PackageReference Include="LitJson" Version="0.16.0" />
+  <ItemGroup>    
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
 

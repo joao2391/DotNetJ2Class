@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using LitJson;
 
 namespace DotNet.J2Class
 {
@@ -45,10 +39,18 @@ namespace DotNet.J2Class
                     if (i % 2 == 0)
                     {
                         var removeChave = jsonWithInfoFormatted[i].Trim().Remove(0, 1);
-                        removeChave = removeChave.Remove(removeChave.Length - 1);
+
+                        if(removeChave.Length > 0)
+                        {
+                            removeChave = removeChave.Remove(removeChave.Length - 1);
+                        }                        
 
                         var removeValor = jsonWithInfoFormatted[i + 1].Remove(0, 1);
-                        removeValor = removeValor.Remove(removeValor.Length - 1);
+
+                        if (removeValor.Length > 0)
+                        {
+                            removeValor = removeValor.Remove(removeValor.Length - 1);
+                        }                        
 
                         keyValue.Add(removeChave, removeValor);
                     }

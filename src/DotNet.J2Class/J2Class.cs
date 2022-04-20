@@ -40,10 +40,10 @@ namespace DotNet.J2Class
 
                 return myObject;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //TODO Improve Exception's return
-                throw ex;
+                throw;
             }
             
         }
@@ -76,10 +76,10 @@ namespace DotNet.J2Class
 
                 return myObject;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //TODO Improve Exception's return
-                throw ex;
+                throw;
             }
             
         }
