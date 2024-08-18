@@ -1,3 +1,5 @@
+> ⚠️ THIS LIB IS UNDER MAINTENANCE
+
 # DotNet.J2Class [![Nuget](https://img.shields.io/nuget/v/DotNetJ2Class)](https://www.nuget.org/packages/DotNetJ2Class/) ![Nuget](https://img.shields.io/nuget/dt/DotNetJ2Class)
 
 This lib helps you to create a class at runtime from a JSON. It means that you don't need to change your class every time a JSON that you consume has changed.
