@@ -7,6 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http;
+using System.Diagnostics;
 
 namespace ConsoleApp1
 {
@@ -18,7 +19,8 @@ namespace ConsoleApp1
             var resp = client.GetAsync("https://gorest.co.in/public/v2/users/1").Result.Content.ReadAsStringAsync().Result;
 
             string json = @"{'Test':'TestValue', 'Test2':'TestValue2', 'Test3':'TestValue3'}";
-            string json2 = @"{'TestProp': { 'Test': 'TestValue'} }";
+            string json2 = @"{'TestProp': { 'TestF1': 'TestValue1', 'TestF2':'TestValue2'}, 'TestProp2': { 'TestP2' : 'TestValueP2'},'TestProp3': { 'TestP3' : 'TestValueP3'} }";
+            //@"{'TestProp': { 'Test': 'TestValue'} }";
             
             var result = JsonConvert.DeserializeObject<object>(json);
             object result2 = JsonConvert.DeserializeObject<object>(json2);
