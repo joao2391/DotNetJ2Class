@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using System.Linq;
 
 namespace DotNet.J2Class
 {
@@ -8,92 +7,80 @@ namespace DotNet.J2Class
     {
         internal static IDictionary<string, object> ReturnKeyValueFromJson(string json)
         {
-         
-            Dictionary<string, object> keyValue = new Dictionary<string, object>();
-            Dictionary<string, object> keyValueResult = new Dictionary<string, object>();
+            var keyValue = new Dictionary<string, object>();
 
-            var removed = json.Remove(0, 1);
-                removed = removed.Remove(removed.Length - 1);
+            if (string.IsNullOrWhiteSpace(json))
+                return keyValue;
 
-                string[] newjson = removed.Split(',');
+            try
+            {
+                var token = JToken.Parse(json);
 
-                var jsonWithInfoFormatted = new string[newjson.Length * 2];
-
-                
-
-                for (int i = 0; i < newjson.Length; i++)
+                if (token is JObject jObject)
                 {
-                    if (jsonWithInfoFormatted[i] == null)
+                    foreach (var prop in jObject.Properties())
                     {
-                        newjson[i].Split(':').CopyTo(jsonWithInfoFormatted, i);
-                    }
-                    else
-                    {
-                        newjson[i].Split(':').CopyTo(jsonWithInfoFormatted, i * 2);
-                    }
+                        var val = prop.Value;
 
-                }
-
-                for (int i = 0; i < jsonWithInfoFormatted.Length; i++)
-                {
-                    if (i % 2 == 0)
-                    {
-                        var removeChave = jsonWithInfoFormatted[i].Trim().Remove(0, 1);
-
-                        if(removeChave.Length > 0)
+                        if (val.Type == JTokenType.Object)
                         {
-                            removeChave = removeChave.Remove(removeChave.Length - 1);
-                        }                        
-
-                        var removeValor = jsonWithInfoFormatted[i + 1].Remove(0, 1);
-
-                        if (removeValor.Length > 0)
+                            // keep nested objects as dictionaries when requested
+                            keyValue.Add(prop.Name, ReturnKeyValueFromJson(val.ToString()));
+                        }
+                        else if (val.Type == JTokenType.Array)
                         {
-                            removeValor = removeValor.Remove(removeValor.Length - 1);
-                        }                        
-
-                        keyValue.Add(removeChave, removeValor);
+                            keyValue.Add(prop.Name, val.ToObject<List<object>>());
+                        }
+                        else
+                        {
+                            keyValue.Add(prop.Name, val.ToObject<object>());
+                        }
                     }
                 }
+            }
+            catch
+            {
+                // fall back to empty dictionary on parse errors (caller handles failures)
+            }
 
-                keyValueResult = keyValue.Count > 0 ? keyValue : new Dictionary<string, object>();
-
-                return keyValueResult;          
-
+            return keyValue;
         }
 
 
         internal static IDictionary<string, IDictionary<string, object>> ReturnKeyValueFromComplexJson(string json)
-        {          
-            
-            Dictionary<string, string[]> keyValues = new Dictionary<string, string[]>();
-            Dictionary<string, IDictionary<string, object>> keyValueObjDic = new Dictionary<string, IDictionary<string, object>>();
+        {
+            var keyValueObjDic = new Dictionary<string, IDictionary<string, object>>();
 
-            var jObject = JObject.Parse(json);
+            if (string.IsNullOrWhiteSpace(json))
+                return keyValueObjDic;
 
-            foreach (var item in jObject)
+            try
             {
-                var value = item.Value.ToString();
+                var jObject = JObject.Parse(json);
 
-                if(value.Contains('{'))
+                foreach (var prop in jObject.Properties())
                 {
-                    var result = ReturnKeyValueFromJson(value);
-                    keyValueObjDic.Add(item.Key, result);
-                }
-                else
-                {
-                    var result = new Dictionary<string, object>();
-                    result.Add(item.Key, item.Value);
-                    keyValueObjDic.Add(item.Key, result);
+                    var val = prop.Value;
 
+                    if (val.Type == JTokenType.Object)
+                    {
+                        var inner = ReturnKeyValueFromJson(val.ToString());
+                        keyValueObjDic.Add(prop.Name, inner);
+                    }
+                    else
+                    {
+                        var result = new Dictionary<string, object>();
+                        result.Add(prop.Name, val.ToObject<object>());
+                        keyValueObjDic.Add(prop.Name, result);
+                    }
                 }
-                
+            }
+            catch
+            {
+                // return empty collection on parse errors
             }
 
-            var resultCollection = keyValueObjDic.Count > 0 ? keyValueObjDic : new Dictionary<string, IDictionary<string, object>>();
-
-            return resultCollection;
-
+            return keyValueObjDic;
         }
     }
 }

@@ -11,7 +11,7 @@
             "type": "coreclr",
             "request": "launch",          
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/test/ConsoleApp1/bin/Debug/netcoreapp3.1/ConsoleApp1.dll",
+            "program": "/Users/joaopaulo/Documents/Projects/DotNetJ2Class/test/ConsoleApp1/bin/Debug/net9.0/ConsoleApp1.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",

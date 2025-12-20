@@ -27,8 +27,12 @@ namespace ConsoleApp1
             Console.WriteLine(result);
             Console.WriteLine(tipo.GetProperties());
            
-            var myObject = J2Class.CreateObjectFromComplexJson(resp, "TesteClass");
-
+            var myObject = J2Class.CreateObjectFromJson(json, "TesteClass");
+            dynamic dyn = myObject;
+            
+            var myObject2 = J2Class.CreateObjectFromComplexJson(json2, "TesteClass2");
+            dynamic dyn2 = myObject2;
+            
             Console.ReadKey();
         }
     }

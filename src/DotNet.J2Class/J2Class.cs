@@ -38,12 +38,11 @@ namespace DotNet.J2Class
                     info.SetValue(myObject, item.Value);
                 }
 
-                return myObject;
+                return (dynamic)myObject;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO Improve Exception's return
-                throw;
+                throw new InvalidOperationException("Failed to create object from JSON.", ex);
             }
             
         }
@@ -74,7 +73,7 @@ namespace DotNet.J2Class
                     info.SetValue(myObject, item.Value);
                 }
 
-                return myObject;
+                return (dynamic)myObject;
             }
             catch (Exception)
             {
@@ -130,7 +129,7 @@ namespace DotNet.J2Class
           
             foreach (var field in keyValue)
             {
-                CreateProperty(tb, field.Key, field.Value.GetType());
+                CreateProperty(tb, field.Key, GetPropertyType(field.Value, field.Key, className, moduleName));
             }
                 
             
@@ -196,6 +195,20 @@ namespace DotNet.J2Class
             propertyBuilder.SetSetMethod(setPropMthdBldr);
             
             
+        }
+
+        private static Type GetPropertyType(object value, string propertyName, string className, string moduleName)
+        {
+            if (value is IDictionary<string, object> nestedDict)
+            {
+                return CompileResultType(nestedDict, $"{className}_{propertyName}", moduleName);
+            }
+            if (value is IList<object> list && list.Count > 0)
+            {
+                var elementType = GetPropertyType(list[0], propertyName + "Item", className, moduleName);
+                return typeof(List<>).MakeGenericType(elementType);
+            }
+            return value?.GetType() ?? typeof(object);
         }
     }
 }
