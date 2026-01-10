@@ -1,51 +1,65 @@
 > ⚠️ THIS LIB IS UNDER MAINTENANCE
 
-# DotNet.J2Class [![Nuget](https://img.shields.io/nuget/v/DotNetJ2Class)](https://www.nuget.org/packages/DotNetJ2Class/) ![Nuget](https://img.shields.io/nuget/dt/DotNetJ2Class)
+# DotNet.J2Class
 
-This lib helps you to create a class at runtime from a JSON. It means that you don't need to change your class every time a JSON that you consume has changed.
+[![NuGet](https://img.shields.io/nuget/v/DotNetJ2Class)](https://www.nuget.org/packages/DotNetJ2Class/)
 
+DotNet.J2Class generates plain .NET POCO types at runtime from JSON payloads using Reflection.Emit.
+It's useful for quickly mapping unknown or evolving JSON schemas into runtime-accessible objects without maintaining static DTOs.
 
-## Notes
-- Upgrade to .NET 6
-## BETA Version
-You can convert only simple JSON like "{Foo: barValue}". <br>
-NEW: you can try to convert this kind of JSON "{'Foo': {Bar1: barValue, Bar2: bar2Value}}".
+Quick highlights
+- Runtime type generation using `TypeBuilder`/`PropertyBuilder` and `ILGenerator`.
+- Supports nested objects and arrays (primitive and object arrays are handled).
+- Caches generated types by schema signature to avoid re-emitting identical types.
 
-## Installation
+# Getting started
 
-Use the package manager to install.
+Install (NuGet):
 
 ```bash
-Install-Package DotNetJ2Class -Version 1.0.3
+Install-Package DotNetJ2Class
 ```
 
-## Usage
+# Basic usage
 
-After install the package, add this code in your "using" block:
-```C#
+```csharp
 using DotNet.J2Class;
-```
-and
-```C#
-string json = @"{'Foo': 'barValue'}";
 
-//You can set a name
-//for the class that will be created.
-//If you don't pass any name,
-//it will be create with DefaultName.
-//The same happens with module name.
-//Both parameters are optional.
-string className = "CLASS_NAME";
-string moduleName = "MODULE_NAME"
+string simple = "{'Foo':'bar'}";
+var obj = J2Class.CreateObjectFromJson(simple, "MyClass");
+dynamic dyn = obj;
+Console.WriteLine(dyn.Foo); // -> bar
 
-var myObject = J2Class.CreateObjectFromJson(json, className, moduleName);
-//myObject will be like a "className" object with a string property called "Foo" and its value "barValue" 
+string complex = "{'Person': {'Name':'Alice','Age':30}, 'Tags': ['x','y']}";
+var obj2 = J2Class.CreateObjectFromComplexJson(complex, "RootClass");
+dynamic d2 = obj2;
+Console.WriteLine(d2.Person.Name); // -> Alice
 ```
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+# Commands
 
-Please make sure to update tests as appropriate.
+```bash
+dotnet build
+dotnet test
+dotnet run --project test/ConsoleApp1
+```
 
-## License
+Important notes / gotchas
+- The project targets `net9.0` (see `src/DotNet.J2Class/DotNet.J2Class.csproj`).
+- Parsing: inputs using single quotes are normalized internally, but prefer valid JSON (double quotes) for robustness.
+- Arrays: homogeneous primitive arrays are materialized as typed `List<T>` (e.g. `List<string>`); mixed or empty arrays fall back to `List<object>`.
+- Exceptions: `CreateObjectFromJson` wraps failures in `InvalidOperationException` to surface errors; `CreateObjectFromComplexJson` preserves thrown exceptions for easier debugging in some paths.
+- Caching: generated types are cached by a schema signature — this improves performance but increases runtime memory usage for many distinct schemas.
+
+# Testing
+
+- Tests live in `test/DotNet.J2Class.Tests` and use NUnit. They cover simple, complex, array, concurrency and basic performance scenarios.
+
+# Contributing
+
+- PRs welcome. For larger changes open an issue first.
+- When changing parsing or type generation, add tests in `test/DotNet.J2Class.Tests` demonstrating expected behaviors.
+
+# License
+
 [MIT](https://choosealicense.com/licenses/mit/)
