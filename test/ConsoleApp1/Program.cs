@@ -20,7 +20,6 @@ namespace ConsoleApp1
 
             string json = @"{'Test':'TestValue', 'Test2':'TestValue2', 'Test3':'TestValue3'}";
             string json2 = @"{'TestProp': { 'TestF1': 'TestValue1', 'TestF2':'TestValue2'}, 'TestProp2': { 'TestP2' : 'TestValueP2'},'TestProp3': { 'TestP3' : 'TestValueP3'} }";
-            //@"{'TestProp': { 'Test': 'TestValue'} }";
             
             var result = JsonConvert.DeserializeObject<object>(json);
             object result2 = JsonConvert.DeserializeObject<object>(json2);
@@ -30,11 +29,12 @@ namespace ConsoleApp1
             Console.WriteLine(tipo.GetProperties());
            
             var myObject = J2Class.CreateObjectFromJson(json, "TesteClass");
-            dynamic dyn = myObject;
+            dynamic dyn = myObject; 
+            Console.WriteLine(dyn.Test);
             
             var myObject2 = J2Class.CreateObjectFromComplexJson(json2, "TesteClass2");
             dynamic dyn2 = myObject2;
-            
+            Console.WriteLine(dyn2.TestProp.TestF1);
             Console.ReadKey();
         }
     }
