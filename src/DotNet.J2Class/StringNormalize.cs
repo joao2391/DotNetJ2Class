@@ -116,15 +116,17 @@ namespace DotNet.J2Class
                     }
                     else
                     {
-                        var result = new Dictionary<string, object>();
-                        result.Add(prop.Name, val.ToObject<object>());
+                        var result = new Dictionary<string, object>
+                        {
+                            { prop.Name, val.ToObject<object>() }
+                        };
                         keyValueObjDic.Add(prop.Name, result);
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                // return empty collection on parse errors
+                throw;
             }
 
             return keyValueObjDic;
