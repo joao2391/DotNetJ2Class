@@ -4,6 +4,7 @@
 	<TargetFramework>net9.0</TargetFramework>
     <Description>This lib helps you to create a class at runtime from a JSON. It means that you don't need to change your class every time a JSON that you consume has changed.</Description>
     <Authors>joao2391</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>Beta Version</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/joao2391/DotNetJ2Class</PackageProjectUrl>
@@ -15,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>    
+    <None Include="../../README.md" Pack="true" PackagePath="\"/>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
