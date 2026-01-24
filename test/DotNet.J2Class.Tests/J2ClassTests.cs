@@ -1,6 +1,10 @@
+using System;
 using NUnit.Framework;
 using DotNet.J2Class;
 using System.Reflection;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Linq;
 
 namespace DotNet.J2Class.Tests
 {
@@ -16,6 +20,10 @@ namespace DotNet.J2Class.Tests
         const string COMPLEX_JSON_TWO_VALUES = @"{'TestProp': { 'TestF1': 'TestValue1', 'TestF2':'TestValue2'}, 'TestProp2': { 'TestP2' : 'TestValueP2'} }";
         const string COMPLEX_JSON_THREE_VALUES = @"{'TestProp': { 'TestF1': 'TestValue1', 'TestF2':'TestValue2'}, 'TestProp2': { 'TestP2' : 'TestValueP2'},'TestProp3': { 'TestP3' : 'TestValueP3'} }";
         const string SIMPLE_PLUS_COMPLEX_JSON_VALUES = @"{'Test1': 'TestValue1', 'TestProp2': { 'TestP2' : 'TestValueP2'} }";
+        const string JSON_ARRAY = @"{'Items': ['A','B','C']}";
+        const string JSON_EMPTY = @"{}";
+        const string JSON_NULL_VALUE = @"{'Maybe': null}";
+        const string JSON_MIXED_LIST = @"{'Mixed': ['A', 1, null]}";
 
         [SetUp]
         public void Setup()
@@ -107,6 +115,95 @@ namespace DotNet.J2Class.Tests
 
             Assert.IsNotNull(obj);            
 
+        }
+
+        [Test]
+        public void Should_Handle_Array_Property()
+        {
+            var obj = J2Class.CreateObjectFromJson(JSON_ARRAY, "ArrayClass", "ArrayModule");
+
+            PropertyInfo propInfo = obj.GetType().GetProperty("Items");
+
+            Assert.IsNotNull(propInfo);
+
+            var val = propInfo.GetValue(obj) as System.Collections.IEnumerable;
+            Assert.IsNotNull(val);
+            int count = 0;
+            foreach (var _ in val) count++;
+            Assert.AreEqual(3, count);
+        }
+
+        [Test]
+        public void Should_Handle_Empty_Json()
+        {
+            var obj = J2Class.CreateObjectFromJson(JSON_EMPTY, "EmptyClass", "EmptyModule");
+
+            Assert.IsNotNull(obj);
+        }
+
+        [Test]
+        public void Should_Handle_Null_Value()
+        {
+            var obj = J2Class.CreateObjectFromJson(JSON_NULL_VALUE, "NullClass", "NullModule");
+
+            PropertyInfo propInfo = obj.GetType().GetProperty("Maybe");
+            Assert.IsNotNull(propInfo);
+        }
+
+        [Test]
+        public void Should_Handle_Mixed_List()
+        {
+            var obj = J2Class.CreateObjectFromJson(JSON_MIXED_LIST, "MixedClass", "MixedModule");
+
+            PropertyInfo propInfo = obj.GetType().GetProperty("Mixed");
+            Assert.IsNotNull(propInfo);
+
+            var val = propInfo.GetValue(obj) as System.Collections.IEnumerable;
+            Assert.IsNotNull(val);
+        }
+
+        [Test]
+        public void Concurrent_Generation_Returns_Same_Type()
+        {
+            const int concurrency = 50;
+            const string json = "{'A':'1','B':'2','C':{'X':'x'}}";
+
+            var tasks = new Task<Type>[concurrency];
+
+            for (int i = 0; i < concurrency; i++)
+            {
+                tasks[i] = Task.Run(() =>
+                {
+                    var obj = J2Class.CreateObjectFromJson(json, "ConcClass", "ConcModule");
+                    return obj.GetType();
+                });
+            }
+
+            Task.WaitAll(tasks);
+
+            var types = tasks.Select(t => t.Result).ToArray();
+            Assert.IsTrue(types.All(t => t == types[0]));
+        }
+
+        [Test]
+        public void Repeated_Generation_Performance_Simple()
+        {
+            const int iterations = 200;
+            const string json = "{'P1':'v1','P2':'v2','P3':'v3'}";
+
+            // warm
+            var first = J2Class.CreateObjectFromJson(json, "PerfClass", "PerfModule");
+
+            var sw = Stopwatch.StartNew();
+            for (int i = 0; i < iterations; i++)
+            {
+                var obj = J2Class.CreateObjectFromJson(json, "PerfClass", "PerfModule");
+                Assert.IsNotNull(obj);
+            }
+            sw.Stop();
+
+            // Loose bound: repeated generation should finish quickly with caching
+            Assert.Less(sw.Elapsed.TotalSeconds, 10, $"Repeated generation took too long: {sw.Elapsed}");
         }
 
 
