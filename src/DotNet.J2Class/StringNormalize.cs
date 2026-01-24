@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
 namespace DotNet.J2Class
@@ -103,28 +104,62 @@ namespace DotNet.J2Class
             try
             {
                 var normalizedJson = json?.Replace('\'', '"') ?? json;
-                var jObject = JObject.Parse(normalizedJson);
+                var jToken = JToken.Parse(normalizedJson);
 
-                foreach (var prop in jObject.Properties())
+                if (jToken.Type == JTokenType.Object)
                 {
-                    var val = prop.Value;
+                    var jObject = (JObject)jToken;
+                    foreach (var prop in jObject.Properties())
+                    {
+                        var val = prop.Value;
 
-                    if (val.Type == JTokenType.Object)
-                    {
-                        var inner = ReturnKeyValueFromJson(val.ToString());
-                        keyValueObjDic.Add(prop.Name, inner);
-                    }
-                    else
-                    {
-                        var result = new Dictionary<string, object>
+                        if (val.Type == JTokenType.Object)
                         {
-                            { prop.Name, val.ToObject<object>() }
-                        };
-                        keyValueObjDic.Add(prop.Name, result);
+                            var inner = ReturnKeyValueFromJson(val.ToString());
+                            keyValueObjDic.Add(prop.Name, inner);
+                        }
+                        else
+                        {
+                            var result = new Dictionary<string, object>
+                            {
+                                { prop.Name, val.ToObject<object>() }
+                            };
+                            keyValueObjDic.Add(prop.Name, result);
+                        }
                     }
                 }
+                else if (jToken.Type == JTokenType.Array)
+                {
+                    var jArray = (JArray)jToken;
+                    for (int i = 0; i < jArray.Count; i++)
+                    {
+                        var item = jArray[i];
+                        if (item.Type == JTokenType.Object)
+                        {
+                            var inner = ReturnKeyValueFromJson(item.ToString());
+                            keyValueObjDic.Add(i.ToString(), inner);
+                        }
+                        else
+                        {
+                            var result = new Dictionary<string, object>
+                            {
+                                { "value", item.ToObject<object>() }
+                            };
+                            keyValueObjDic.Add(i.ToString(), result);
+                        }
+                    }
+                }
+                else
+                {
+                    // For other types, treat as single value
+                    var result = new Dictionary<string, object>
+                    {
+                        { "value", jToken.ToObject<object>() }
+                    };
+                    keyValueObjDic.Add("value", result);
+                }
             }
-            catch(Exception ex)
+            catch
             {
                 throw;
             }
